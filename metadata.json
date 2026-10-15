@@ -1,0 +1,6 @@
+{
+  "name": "App Studio",
+  "description": "Interactive web application workspace built with React, Vite, and Tailwind CSS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
