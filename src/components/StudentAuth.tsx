@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import { 
   GraduationCap, 
-  Mail, 
   Lock, 
   User, 
   Hash, 
-  BookOpen, 
-  Phone, 
   ArrowRight, 
   AlertCircle, 
   CheckCircle2, 
-  Building2,
-  Sparkles
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { Student, StudentLevel } from '../types/booking';
 import { POLY_FACULTIES_AND_DEPTS } from '../data/polyIbadanData';
@@ -34,20 +31,19 @@ export function StudentAuth({
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
   // Login form state
-  const [loginIdentifier, setLoginIdentifier] = useState('2024/ND/CSC/0842');
-  const [loginPassword, setLoginPassword] = useState('password123');
+  const [loginUsername, setLoginUsername] = useState('Haleelat Adebayo');
+  const [loginPassword, setLoginPassword] = useState('2024/ND/CSC/0842');
   const [loginError, setLoginError] = useState<string | null>(null);
 
   // Register form state
   const [regFullName, setRegFullName] = useState('');
-  const [regEmail, setRegEmail] = useState('');
   const [regMatric, setRegMatric] = useState('');
+  const [regConfirmMatric, setRegConfirmMatric] = useState('');
+  const [regEmail, setRegEmail] = useState('');
   const [regFaculty, setRegFaculty] = useState(POLY_FACULTIES_AND_DEPTS[0].faculty);
   const [regDept, setRegDept] = useState(POLY_FACULTIES_AND_DEPTS[0].departments[0]);
   const [regLevel, setRegLevel] = useState<StudentLevel>('ND II');
   const [regPhone, setRegPhone] = useState('');
-  const [regPassword, setRegPassword] = useState('');
-  const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [regError, setRegError] = useState<string | null>(null);
 
   const selectedFacultyObj = POLY_FACULTIES_AND_DEPTS.find(f => f.faculty === regFaculty) || POLY_FACULTIES_AND_DEPTS[0];
@@ -64,18 +60,32 @@ export function StudentAuth({
     e.preventDefault();
     setLoginError(null);
 
-    const q = loginIdentifier.trim().toLowerCase();
-    const student = students.find(
-      s => s.matricNumber.toLowerCase() === q || s.email.toLowerCase() === q
-    );
+    const u = loginUsername.trim().toLowerCase();
+    const p = loginPassword.trim().toLowerCase();
+
+    // Match student by Full Name (username) or partial name or matric / email
+    const student = students.find(s => {
+      const sName = s.fullName.toLowerCase();
+      return (
+        sName === u ||
+        s.matricNumber.toLowerCase() === u ||
+        s.email.toLowerCase() === u ||
+        sName.includes(u) ||
+        u.includes(sName)
+      );
+    });
 
     if (!student) {
-      setLoginError('No student account found with this Matric Number or Email.');
+      setLoginError('No student account found with this username. Please ensure you entered your Full Name or registered Matric Number.');
       return;
     }
 
-    if (student.password && student.password !== loginPassword.trim()) {
-      setLoginError('Incorrect password entered. Please check and try again.');
+    // Login password MUST be their matric number (case-insensitive)
+    const expectedMatricPassword = student.matricNumber.toLowerCase();
+    const customPassword = student.password ? student.password.toLowerCase() : expectedMatricPassword;
+
+    if (p !== expectedMatricPassword && p !== customPassword) {
+      setLoginError('Incorrect password entered. Reminder: Your Matriculation Number is your login password (e.g. 2024/ND/CSC/0842).');
       return;
     }
 
@@ -86,13 +96,14 @@ export function StudentAuth({
     e.preventDefault();
     setRegError(null);
 
-    if (!regFullName.trim() || !regEmail.trim() || !regMatric.trim() || !regPassword.trim()) {
+    if (!regFullName.trim() || !regMatric.trim() || !regConfirmMatric.trim() || !regEmail.trim()) {
       setRegError('Please fill in all mandatory fields.');
       return;
     }
 
-    if (regPassword !== regConfirmPassword) {
-      setRegError('Passwords do not match. Please re-enter.');
+    // Confirm matric number matches
+    if (regMatric.trim().toUpperCase() !== regConfirmMatric.trim().toUpperCase()) {
+      setRegError('Matriculation numbers do not match. Please re-check both fields.');
       return;
     }
 
@@ -106,12 +117,14 @@ export function StudentAuth({
       return;
     }
 
+    const cleanMatric = regMatric.trim().toUpperCase();
+
     const newStudent: Student = {
       id: `stu-${Date.now()}`,
-      matricNumber: regMatric.trim().toUpperCase(),
+      matricNumber: cleanMatric,
       fullName: regFullName.trim(),
       email: regEmail.trim().toLowerCase(),
-      password: regPassword.trim(),
+      password: cleanMatric, // Matric number is the password!
       faculty: regFaculty,
       department: regDept,
       level: regLevel,
@@ -122,13 +135,10 @@ export function StudentAuth({
     onRegisterSuccess(newStudent);
   };
 
-  const quickFillDemoStudent = (matric: string) => {
-    const s = students.find(st => st.matricNumber === matric);
-    if (s) {
-      setLoginIdentifier(s.matricNumber);
-      setLoginPassword(s.password || 'password123');
-      setLoginError(null);
-    }
+  const quickFillDemoStudent = (name: string, matric: string) => {
+    setLoginUsername(name);
+    setLoginPassword(matric);
+    setLoginError(null);
   };
 
   return (
@@ -146,7 +156,7 @@ export function StudentAuth({
             Student Advisory & Booking Portal
           </h1>
           <p className="text-xs sm:text-sm text-[#784728] max-w-md mx-auto mt-1">
-            Book consultations, track availability, and connect with your course lecturers and project supervisors.
+            Book consultations, track availability, and connect with your course lecturers.
           </p>
         </div>
 
@@ -161,7 +171,7 @@ export function StudentAuth({
                 : 'text-[#784728] hover:text-[#3B2211]'
             }`}
           >
-            Student Login
+            Student Sign In
           </button>
           <button
             type="button"
@@ -172,7 +182,7 @@ export function StudentAuth({
                 : 'text-[#784728] hover:text-[#3B2211]'
             }`}
           >
-            Create New Account (Register)
+            Create Student Account
           </button>
         </div>
       </div>
@@ -185,7 +195,7 @@ export function StudentAuth({
             <div className="border-b border-[#EFE6DF] pb-3">
               <h2 className="text-lg font-bold text-[#3B2211]">Student Sign In</h2>
               <p className="text-xs text-[#784728]">
-                Enter your registered Polytechnic of Ibadan matric number or student email.
+                Log in with your full name as your username, and your matriculation number as your password.
               </p>
             </div>
 
@@ -196,34 +206,51 @@ export function StudentAuth({
               </div>
             )}
 
+            {/* Instruction Notice Banner */}
+            <div className="p-3.5 rounded-2xl bg-[#FAF7F5] border border-[#E2D7CF] flex items-start gap-3 text-xs text-[#4A2E1B]">
+              <Info className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold block text-[#3B2211]">Student Credentials:</span>
+                <span className="text-[#784728]">
+                  • <strong>Username:</strong> Your full registered name<br />
+                  • <strong>Password:</strong> Your official Matriculation Number
+                </span>
+              </div>
+            </div>
+
+            {/* Username (Full Name) */}
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
-                <Hash className="w-3.5 h-3.5 text-[#D97706]" />
-                Matric Number or Email
+                <User className="w-3.5 h-3.5 text-[#D97706]" />
+                Username (Your Full Name)
               </label>
               <input
                 type="text"
-                value={loginIdentifier}
-                onChange={(e) => setLoginIdentifier(e.target.value)}
-                placeholder="e.g. 2024/ND/CSC/0842 or student@email.com"
+                value={loginUsername}
+                onChange={(e) => setLoginUsername(e.target.value)}
+                placeholder="e.g. Haleelat Adebayo"
                 required
                 className="w-full px-4 py-3 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] focus:ring-1 focus:ring-[#4A2E1B]"
               />
             </div>
 
+            {/* Password (Matric Number) */}
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-[#D97706]" />
-                Password
+                Password (Your Matric Number)
               </label>
               <input
-                type="password"
+                type="text"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
-                placeholder="Enter your student password"
+                placeholder="e.g. 2024/ND/CSC/0842"
                 required
-                className="w-full px-4 py-3 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] focus:ring-1 focus:ring-[#4A2E1B]"
+                className="w-full px-4 py-3 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] focus:ring-1 focus:ring-[#4A2E1B] font-mono uppercase"
               />
+              <span className="text-[11px] text-[#8C5638] block">
+                Enter your exact matriculation number (including slashes).
+              </span>
             </div>
 
             <button
@@ -237,24 +264,24 @@ export function StudentAuth({
             {/* Quick Demo Preload */}
             <div className="pt-4 border-t border-[#EFE6DF] space-y-2">
               <span className="text-[11px] font-semibold text-[#8C5638] uppercase tracking-wider block">
-                Quick Test Accounts (Click to auto-fill):
+                Quick Test Student Accounts (Click to auto-fill):
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 <button
                   type="button"
-                  onClick={() => quickFillDemoStudent('2024/ND/CSC/0842')}
+                  onClick={() => quickFillDemoStudent('Haleelat Adebayo', '2024/ND/CSC/0842')}
                   className="p-2.5 rounded-xl border border-[#E2D7CF] bg-[#FAF7F5] hover:bg-[#F5EFEB] text-left transition-colors cursor-pointer"
                 >
                   <span className="font-bold text-[#3B2211] block">Haleelat Adebayo</span>
-                  <span className="text-[11px] text-[#784728] font-mono">2024/ND/CSC/0842 (Comp Sci ND II)</span>
+                  <span className="text-[11px] text-[#784728] font-mono">Password: 2024/ND/CSC/0842</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => quickFillDemoStudent('2023/HND/EEE/0194')}
+                  onClick={() => quickFillDemoStudent('Babatunde Olumide Alabi', '2023/HND/EEE/0194')}
                   className="p-2.5 rounded-xl border border-[#E2D7CF] bg-[#FAF7F5] hover:bg-[#F5EFEB] text-left transition-colors cursor-pointer"
                 >
-                  <span className="font-bold text-[#3B2211] block">Babatunde Alabi</span>
-                  <span className="text-[11px] text-[#784728] font-mono">2023/HND/EEE/0194 (Elect Engr HND II)</span>
+                  <span className="font-bold text-[#3B2211] block">Babatunde Olumide Alabi</span>
+                  <span className="text-[11px] text-[#784728] font-mono">Password: 2023/HND/EEE/0194</span>
                 </button>
               </div>
             </div>
@@ -265,8 +292,19 @@ export function StudentAuth({
             <div className="border-b border-[#EFE6DF] pb-3">
               <h2 className="text-lg font-bold text-[#3B2211]">New Student Registration</h2>
               <p className="text-xs text-[#784728]">
-                Provide your official PolyIbadan academic details to create your student account.
+                Register with your full name as your username. Your matric number will automatically be your login password.
               </p>
+            </div>
+
+            {/* Notice banner: Matric number is password */}
+            <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-900 text-xs flex items-start gap-3">
+              <Info className="w-5 h-5 text-[#D97706] shrink-0 mt-0.5" />
+              <div>
+                <strong className="block text-[#4A2E1B] text-sm">Notice: Your Matric Number is your Password!</strong>
+                <p className="text-xs text-[#784728] mt-1">
+                  You do not need to create a separate password. When logging in, your <strong>Username is your Name</strong> and your <strong>Password is your Matriculation Number</strong>. Please confirm your matric number carefully below.
+                </p>
+              </div>
             </div>
 
             {regError && (
@@ -276,24 +314,28 @@ export function StudentAuth({
               </div>
             )}
 
+            {/* Full Name */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-[#D97706]" />
+                Student Full Name (This will be your Username) *
+              </label>
+              <input
+                type="text"
+                value={regFullName}
+                onChange={(e) => setRegFullName(e.target.value)}
+                placeholder="e.g. Adebayo Haleelat Funmilayo"
+                required
+                className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
+              />
+            </div>
+
+            {/* Matriculation Number & Confirmation */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
-                  Full Name (Surname First) *
-                </label>
-                <input
-                  type="text"
-                  value={regFullName}
-                  onChange={(e) => setRegFullName(e.target.value)}
-                  placeholder="e.g. Adebayo Haleelat Funmilayo"
-                  required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
-                  Matriculation Number *
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
+                  <Hash className="w-3.5 h-3.5 text-[#D97706]" />
+                  Matriculation Number (Your Password) *
                 </label>
                 <input
                   type="text"
@@ -304,8 +346,24 @@ export function StudentAuth({
                   className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] font-mono uppercase"
                 />
               </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
+                  <Hash className="w-3.5 h-3.5 text-[#D97706]" />
+                  Confirm Matriculation Number *
+                </label>
+                <input
+                  type="text"
+                  value={regConfirmMatric}
+                  onChange={(e) => setRegConfirmMatric(e.target.value)}
+                  placeholder="Re-enter matric number"
+                  required
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] font-mono uppercase"
+                />
+              </div>
             </div>
 
+            {/* Email & Phone */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
@@ -335,6 +393,7 @@ export function StudentAuth({
               </div>
             </div>
 
+            {/* Faculty, Department, Level */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
@@ -387,36 +446,6 @@ export function StudentAuth({
               </select>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
-                  Create Password *
-                </label>
-                <input
-                  type="password"
-                  value={regPassword}
-                  onChange={(e) => setRegPassword(e.target.value)}
-                  placeholder="Min 6 characters"
-                  required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
-                  Confirm Password *
-                </label>
-                <input
-                  type="password"
-                  value={regConfirmPassword}
-                  onChange={(e) => setRegConfirmPassword(e.target.value)}
-                  placeholder="Re-type password"
-                  required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
-                />
-              </div>
-            </div>
-
             <button
               type="submit"
               className="w-full py-3.5 px-4 rounded-xl bg-[#4A2E1B] hover:bg-[#3B2211] text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#4A2E1B]/20 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
@@ -428,7 +457,7 @@ export function StudentAuth({
         )}
       </div>
 
-      {/* Portal Cross Links */}
+      {/* Switch to other portals if not signed in */}
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-[#784728]">
         <span>Are you a faculty member or administrator?</span>
         <div className="flex items-center gap-3">

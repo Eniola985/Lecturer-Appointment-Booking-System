@@ -6,11 +6,10 @@ import {
   Bell, 
   LogOut, 
   Home, 
-  User, 
-  KeyRound, 
-  ChevronDown,
-  Menu,
-  X
+  Menu, 
+  X,
+  User,
+  ShieldAlert
 } from 'lucide-react';
 import { Student, Lecturer, NotificationItem } from '../types/booking';
 
@@ -49,15 +48,42 @@ export function Navbar({
   const [showNotifMenu, setShowNotifMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  // Filter relevant notifications for current active role
+  const relevantNotifications = notifications.filter(n => {
+    if (currentStudent) {
+      return n.userId === currentStudent.id || n.userId === currentStudent.matricNumber || n.userType === 'student';
+    }
+    if (currentLecturer) {
+      return n.userId === currentLecturer.id || n.userType === 'lecturer';
+    }
+    if (isAdminLoggedIn) {
+      return n.userType === 'admin';
+    }
+    return true;
+  });
+
+  const unreadCount = relevantNotifications.filter(n => !n.read).length;
+
+  const handleBrandClick = () => {
+    if (currentStudent) {
+      onNavigate('student-dashboard');
+    } else if (currentLecturer) {
+      onNavigate('lecturer-dashboard');
+    } else if (isAdminLoggedIn) {
+      onNavigate('admin-dashboard');
+    } else {
+      onNavigate('landing');
+    }
+  };
 
   return (
     <header className="bg-white border-b-2 border-[#E2D7CF] sticky top-0 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
         {/* Brand / Logo */}
         <div 
-          onClick={() => onNavigate('landing')}
+          onClick={handleBrandClick}
           className="flex items-center gap-3 cursor-pointer group"
+          title="The Polytechnic, Ibadan"
         >
           <div className="w-11 h-11 rounded-2xl bg-[#4A2E1B] text-[#FDFBF7] flex items-center justify-center shadow-md border-2 border-[#D97706]/40 shrink-0 group-hover:scale-105 transition-transform">
             <GraduationCap className="w-6 h-6 text-[#F59E0B]" />
@@ -77,9 +103,9 @@ export function Navbar({
           </div>
         </div>
 
-        {/* Desktop Navigation Links */}
+        {/* Desktop Navigation Links — Strictly Isolated by Active Role */}
         <div className="hidden lg:flex items-center gap-2">
-          {/* Home Button */}
+          {/* Home Button (Available for all) */}
           <button
             type="button"
             onClick={() => onNavigate('landing')}
@@ -93,129 +119,182 @@ export function Navbar({
             <span>Home</span>
           </button>
 
-          {/* Student Portal Link */}
-          <button
-            type="button"
-            onClick={() => onNavigate(currentStudent ? 'student-dashboard' : 'student-auth')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              currentView === 'student-auth' || currentView === 'student-dashboard'
-                ? 'bg-[#4A2E1B] text-white shadow-sm'
-                : 'text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB]'
-            }`}
-          >
-            <GraduationCap className="w-3.5 h-3.5 text-[#F59E0B]" />
-            <span>Student Portal {currentStudent ? '(Logged In)' : ''}</span>
-          </button>
+          {/* 1. If STUDENT is logged in: ONLY show Student Dashboard */}
+          {currentStudent && (
+            <button
+              type="button"
+              onClick={() => onNavigate('student-dashboard')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                currentView === 'student-dashboard'
+                  ? 'bg-[#4A2E1B] text-white shadow-sm'
+                  : 'text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB]'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5 text-[#F59E0B]" />
+              <span>My Student Portal</span>
+            </button>
+          )}
 
-          {/* Lecturer Portal Link */}
-          <button
-            type="button"
-            onClick={() => onNavigate(currentLecturer ? 'lecturer-dashboard' : 'lecturer-auth')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              currentView === 'lecturer-auth' || currentView === 'lecturer-dashboard'
-                ? 'bg-[#4A2E1B] text-white shadow-sm'
-                : 'text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB]'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5 text-[#F59E0B]" />
-            <span>Lecturer Portal {currentLecturer ? '(Logged In)' : ''}</span>
-          </button>
+          {/* 2. If LECTURER is logged in: ONLY show Lecturer Dashboard */}
+          {currentLecturer && (
+            <button
+              type="button"
+              onClick={() => onNavigate('lecturer-dashboard')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                currentView === 'lecturer-dashboard'
+                  ? 'bg-[#4A2E1B] text-white shadow-sm'
+                  : 'text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB]'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5 text-[#F59E0B]" />
+              <span>My Faculty Desk</span>
+            </button>
+          )}
 
-          {/* Admin Portal Link */}
-          <button
-            type="button"
-            onClick={() => onNavigate(isAdminLoggedIn ? 'admin-dashboard' : 'admin-auth')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              currentView === 'admin-auth' || currentView === 'admin-dashboard'
-                ? 'bg-[#4A2E1B] text-white shadow-sm'
-                : 'text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB]'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-[#F59E0B]" />
-            <span>Admin Portal</span>
-          </button>
+          {/* 3. If ADMIN is logged in: ONLY show Admin Dashboard */}
+          {isAdminLoggedIn && (
+            <button
+              type="button"
+              onClick={() => onNavigate('admin-dashboard')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                currentView === 'admin-dashboard'
+                  ? 'bg-[#4A2E1B] text-white shadow-sm'
+                  : 'text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB]'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-[#F59E0B]" />
+              <span>Admin Console</span>
+            </button>
+          )}
+
+          {/* 4. If NO ONE is logged in: Show the separate Login links */}
+          {!currentStudent && !currentLecturer && !isAdminLoggedIn && (
+            <>
+              <button
+                type="button"
+                onClick={() => onNavigate('student-auth')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  currentView === 'student-auth'
+                    ? 'bg-[#4A2E1B] text-white shadow-sm'
+                    : 'text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB]'
+                }`}
+              >
+                <GraduationCap className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <span>Student Login</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigate('lecturer-auth')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  currentView === 'lecturer-auth'
+                    ? 'bg-[#4A2E1B] text-white shadow-sm'
+                    : 'text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB]'
+                }`}
+              >
+                <Building2 className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <span>Lecturer Login</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigate('admin-auth')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  currentView === 'admin-auth'
+                    ? 'bg-[#4A2E1B] text-white shadow-sm'
+                    : 'text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB]'
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-[#F59E0B]" />
+                <span>Admin Login</span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Right side: Notifications & Active User Info */}
         <div className="flex items-center gap-3">
-          {/* Notifications bell */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowNotifMenu(!showNotifMenu)}
-              className="relative p-2.5 rounded-xl bg-[#FAF7F5] border border-[#E2D7CF] text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB] transition-colors cursor-pointer"
-              title="Notifications"
-            >
-              <Bell className="w-4 h-4" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#D97706] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-
-            {showNotifMenu && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border-2 border-[#E2D7CF] shadow-2xl p-4 z-50 space-y-3">
-                <div className="flex items-center justify-between border-b border-[#EFE6DF] pb-2">
-                  <span className="text-xs font-bold text-[#4A2E1B] uppercase tracking-wider">
-                    Notifications ({notifications.length})
-                  </span>
-                  {unreadCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={onClearAllNotifications}
-                      className="text-[11px] text-[#D97706] hover:underline font-bold"
-                    >
-                      Mark all as read
-                    </button>
-                  )}
-                </div>
-
-                <div className="space-y-2 max-h-72 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-[#784728]">No alerts recorded.</div>
-                  ) : (
-                    notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        onClick={() => onMarkNotificationRead(n.id)}
-                        className={`p-3 rounded-xl border text-xs transition-colors cursor-pointer ${
-                          n.read
-                            ? 'bg-[#FAF7F5] border-[#E2D7CF] text-[#784728]'
-                            : 'bg-amber-50 border-amber-300 text-[#3B2211]'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between font-bold mb-1">
-                          <span className="text-[#4A2E1B]">{n.title}</span>
-                          <span className="text-[10px] text-[#8C5638] font-mono">{n.timestamp}</span>
-                        </div>
-                        <p className="text-[11px] leading-relaxed">{n.message}</p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Active User session pill / Sign Out */}
+          {/* Notifications bell (Only when someone is logged in) */}
           {(currentStudent || currentLecturer || isAdminLoggedIn) && (
-            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-[#E2D7CF] text-xs">
-              <div className="text-right">
-                <div className="font-extrabold text-[#3B2211] leading-tight max-w-[130px] truncate">
-                  {currentStudent ? currentStudent.fullName : currentLecturer ? currentLecturer.name : 'Director (Admin)'}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowNotifMenu(!showNotifMenu)}
+                className="relative p-2.5 rounded-xl bg-[#FAF7F5] border border-[#E2D7CF] text-[#784728] hover:text-[#3B2211] hover:bg-[#F5EFEB] transition-colors cursor-pointer"
+                title="Notifications"
+              >
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#D97706] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {showNotifMenu && (
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border-2 border-[#E2D7CF] shadow-2xl p-4 z-50 space-y-3">
+                  <div className="flex items-center justify-between border-b border-[#EFE6DF] pb-2">
+                    <span className="text-xs font-bold text-[#4A2E1B] uppercase tracking-wider">
+                      My Notifications ({relevantNotifications.length})
+                    </span>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={onClearAllNotifications}
+                        className="text-[11px] text-[#D97706] hover:underline font-bold"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 max-h-72 overflow-y-auto">
+                    {relevantNotifications.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-[#784728]">No alerts recorded for your account.</div>
+                    ) : (
+                      relevantNotifications.map((n) => (
+                        <div
+                          key={n.id}
+                          onClick={() => onMarkNotificationRead(n.id)}
+                          className={`p-3 rounded-xl border text-xs transition-colors cursor-pointer ${
+                            n.read
+                              ? 'bg-[#FAF7F5] border-[#E2D7CF] text-[#784728]'
+                              : 'bg-amber-50 border-amber-300 text-[#3B2211]'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between font-bold mb-1">
+                            <span className="text-[#4A2E1B]">{n.title}</span>
+                            <span className="text-[10px] text-[#8C5638] font-mono">{n.timestamp}</span>
+                          </div>
+                          <p className="text-[11px] leading-relaxed">{n.message}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Active User session pill & Logout button */}
+          {(currentStudent || currentLecturer || isAdminLoggedIn) && (
+            <div className="flex items-center gap-2 pl-2 border-l border-[#E2D7CF] text-xs">
+              <div className="text-right hidden sm:block">
+                <div className="font-extrabold text-[#3B2211] leading-tight max-w-[140px] truncate">
+                  {currentStudent ? currentStudent.fullName : currentLecturer ? currentLecturer.name : 'System Administrator'}
                 </div>
                 <div className="text-[10px] text-[#8C5638] font-mono">
-                  {currentStudent ? currentStudent.matricNumber : currentLecturer ? currentLecturer.staffId : 'ADMIN'}
+                  {currentStudent ? currentStudent.matricNumber : currentLecturer ? currentLecturer.title : 'ADMIN'}
                 </div>
               </div>
               <button
                 type="button"
                 onClick={onLogout}
-                className="p-1.5 rounded-lg text-[#8C5638] hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                title="Sign Out / Back to Home"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition-colors cursor-pointer"
+                title="Sign Out"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
           )}
@@ -231,7 +310,7 @@ export function Navbar({
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Menu Dropdown — Strictly Isolated */}
       {showMobileMenu && (
         <div className="lg:hidden border-t border-[#E2D7CF] bg-white p-4 space-y-2 shadow-lg">
           <button
@@ -240,35 +319,72 @@ export function Navbar({
             className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
           >
             <Home className="w-4 h-4 text-[#D97706]" />
-            <span>Home / Landing Page</span>
+            <span>Home</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => { onNavigate(currentStudent ? 'student-dashboard' : 'student-auth'); setShowMobileMenu(false); }}
-            className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
-          >
-            <GraduationCap className="w-4 h-4 text-[#D97706]" />
-            <span>Student Portal {currentStudent ? '(Logged In)' : '(Login/Register)'}</span>
-          </button>
+          {currentStudent && (
+            <button
+              type="button"
+              onClick={() => { onNavigate('student-dashboard'); setShowMobileMenu(false); }}
+              className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
+            >
+              <GraduationCap className="w-4 h-4 text-[#D97706]" />
+              <span>My Student Portal</span>
+            </button>
+          )}
 
-          <button
-            type="button"
-            onClick={() => { onNavigate(currentLecturer ? 'lecturer-dashboard' : 'lecturer-auth'); setShowMobileMenu(false); }}
-            className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
-          >
-            <Building2 className="w-4 h-4 text-[#D97706]" />
-            <span>Lecturer Portal {currentLecturer ? '(Logged In)' : '(Login)'}</span>
-          </button>
+          {currentLecturer && (
+            <button
+              type="button"
+              onClick={() => { onNavigate('lecturer-dashboard'); setShowMobileMenu(false); }}
+              className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
+            >
+              <Building2 className="w-4 h-4 text-[#D97706]" />
+              <span>My Faculty Desk</span>
+            </button>
+          )}
 
-          <button
-            type="button"
-            onClick={() => { onNavigate(isAdminLoggedIn ? 'admin-dashboard' : 'admin-auth'); setShowMobileMenu(false); }}
-            className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
-          >
-            <ShieldCheck className="w-4 h-4 text-[#D97706]" />
-            <span>Administrator Portal {isAdminLoggedIn ? '(Logged In)' : '(Login)'}</span>
-          </button>
+          {isAdminLoggedIn && (
+            <button
+              type="button"
+              onClick={() => { onNavigate('admin-dashboard'); setShowMobileMenu(false); }}
+              className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
+            >
+              <ShieldCheck className="w-4 h-4 text-[#D97706]" />
+              <span>Admin Console</span>
+            </button>
+          )}
+
+          {!currentStudent && !currentLecturer && !isAdminLoggedIn && (
+            <>
+              <button
+                type="button"
+                onClick={() => { onNavigate('student-auth'); setShowMobileMenu(false); }}
+                className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
+              >
+                <GraduationCap className="w-4 h-4 text-[#D97706]" />
+                <span>Student Login / Register</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { onNavigate('lecturer-auth'); setShowMobileMenu(false); }}
+                className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
+              >
+                <Building2 className="w-4 h-4 text-[#D97706]" />
+                <span>Lecturer Login / Register</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { onNavigate('admin-auth'); setShowMobileMenu(false); }}
+                className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-[#4A2E1B] hover:bg-[#FAF7F5] flex items-center gap-2"
+              >
+                <ShieldCheck className="w-4 h-4 text-[#D97706]" />
+                <span>Administrator Sign In</span>
+              </button>
+            </>
+          )}
 
           {(currentStudent || currentLecturer || isAdminLoggedIn) && (
             <div className="pt-2 border-t border-[#E2D7CF]">
@@ -278,7 +394,7 @@ export function Navbar({
                 className="w-full text-left py-2.5 px-3 rounded-xl text-xs font-bold text-rose-700 hover:bg-rose-50 flex items-center gap-2"
               >
                 <LogOut className="w-4 h-4 text-rose-600" />
-                <span>Sign Out of Active Session</span>
+                <span>Sign Out ({currentStudent ? currentStudent.fullName : currentLecturer ? currentLecturer.name : 'Admin'})</span>
               </button>
             </div>
           )}

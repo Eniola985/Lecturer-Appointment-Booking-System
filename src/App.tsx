@@ -10,9 +10,7 @@ import {
   INITIAL_STUDENTS, 
   INITIAL_LECTURERS, 
   INITIAL_REQUESTS, 
-  INITIAL_ANNOUNCEMENTS,
-  ADMIN_CREDENTIALS,
-  LECTURER_DEFAULT_PASSWORD 
+  INITIAL_ANNOUNCEMENTS
 } from './data/polyIbadanData';
 import { Navbar, ActiveView } from './components/Navbar';
 import { LandingPage } from './components/LandingPage';
@@ -22,7 +20,7 @@ import { AdminAuth } from './components/AdminAuth';
 import { StudentPortal } from './components/StudentPortal';
 import { LecturerPortal } from './components/LecturerPortal';
 import { AdminPortal } from './components/AdminPortal';
-import { CheckCircle2, AlertCircle, ArrowLeft, Home } from 'lucide-react';
+import { CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export default function App() {
   // Persistent State
@@ -150,6 +148,53 @@ export default function App() {
     }
   }, [notifications]);
 
+  // STRICT VIEW NAVIGATION & ROUTE GUARD
+  const handleNavigate = (targetView: ActiveView) => {
+    // 1. If student is logged in: cannot view lecturer or admin portals
+    if (loggedStudent) {
+      if (
+        targetView === 'lecturer-dashboard' ||
+        targetView === 'lecturer-auth' ||
+        targetView === 'admin-dashboard' ||
+        targetView === 'admin-auth'
+      ) {
+        showToast('Access restricted: You are currently logged in as a Student. Sign out to switch roles.', 'error');
+        setCurrentView('student-dashboard');
+        return;
+      }
+    }
+
+    // 2. If lecturer is logged in: cannot view student or admin portals
+    if (loggedLecturer) {
+      if (
+        targetView === 'student-dashboard' ||
+        targetView === 'student-auth' ||
+        targetView === 'admin-dashboard' ||
+        targetView === 'admin-auth'
+      ) {
+        showToast('Access restricted: You are currently logged in as Faculty. Sign out to switch roles.', 'error');
+        setCurrentView('lecturer-dashboard');
+        return;
+      }
+    }
+
+    // 3. If admin is logged in: cannot view student or lecturer dashboards
+    if (isAdminLoggedIn) {
+      if (
+        targetView === 'student-dashboard' ||
+        targetView === 'student-auth' ||
+        targetView === 'lecturer-dashboard' ||
+        targetView === 'lecturer-auth'
+      ) {
+        showToast('Access restricted: You are currently logged in as Administrator. Sign out to switch roles.', 'error');
+        setCurrentView('admin-dashboard');
+        return;
+      }
+    }
+
+    setCurrentView(targetView);
+  };
+
   // STUDENT ACTIONS
   const handleStudentSubmitRequest = (newReq: AppointmentRequest) => {
     setRequests(prev => [newReq, ...prev]);
@@ -251,8 +296,8 @@ export default function App() {
         id: `notif-${Date.now()}`,
         userId: current.studentId,
         userType: 'student',
-        title: 'Lecturer Unavailable Notice',
-        message: `${current.lecturerName} is unavailable during your proposed slot (${current.proposedDate}). Reason: "${rejectionReason}"`,
+        title: 'Consultation Unavailable',
+        message: `${current.lecturerName} is unavailable for ${current.proposedDate}. Reason: "${rejectionReason}"`,
         timestamp: 'Just now',
         read: false,
         appointmentId: requestId,
@@ -283,7 +328,7 @@ export default function App() {
   // ADMIN ACTIONS
   const handleAdminAddLecturer = (newLec: Lecturer) => {
     setLecturers(prev => [newLec, ...prev]);
-    showToast(`Added ${newLec.name} to PolyIbadan directory`);
+    showToast(`Added ${newLec.name} to PolyIbadan faculty directory`);
   };
 
   const handleAdminDeleteLecturer = (lecId: string) => {
@@ -347,7 +392,7 @@ export default function App() {
       {/* Navigation Header with Home & All Portals */}
       <Navbar
         currentView={currentView}
-        onNavigate={setCurrentView}
+        onNavigate={handleNavigate}
         currentStudent={loggedStudent}
         currentLecturer={loggedLecturer}
         isAdminLoggedIn={isAdminLoggedIn}
@@ -364,11 +409,11 @@ export default function App() {
           <div className="mb-6 flex items-center justify-between">
             <button
               type="button"
-              onClick={() => setCurrentView('landing')}
+              onClick={() => handleNavigate('landing')}
               className="inline-flex items-center gap-2 text-xs font-bold text-[#8C5638] hover:text-[#4A2E1B] bg-white px-3.5 py-1.5 rounded-xl border border-[#E2D7CF] transition-colors cursor-pointer shadow-sm"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>&larr; Back to Home / Portal Selection</span>
+              <span>&larr; Back to Home</span>
             </button>
 
             <span className="text-xs font-mono font-bold text-[#784728] uppercase">
@@ -380,7 +425,7 @@ export default function App() {
         {/* 1. OFFICIAL LANDING PAGE */}
         {currentView === 'landing' && (
           <LandingPage
-            onNavigate={setCurrentView}
+            onNavigate={handleNavigate}
             announcements={announcements}
             stats={{
               totalLecturers: lecturers.length,
@@ -410,8 +455,8 @@ export default function App() {
               setCurrentView('student-dashboard');
               showToast(`Registration complete! Welcome, ${newS.fullName}`);
             }}
-            onSwitchToLecturerLogin={() => setCurrentView('lecturer-auth')}
-            onSwitchToAdminLogin={() => setCurrentView('admin-auth')}
+            onSwitchToLecturerLogin={() => handleNavigate('lecturer-auth')}
+            onSwitchToAdminLogin={() => handleNavigate('admin-auth')}
           />
         )}
 
@@ -440,13 +485,13 @@ export default function App() {
                 setLoggedStudent(newS);
                 setCurrentView('student-dashboard');
               }}
-              onSwitchToLecturerLogin={() => setCurrentView('lecturer-auth')}
-              onSwitchToAdminLogin={() => setCurrentView('admin-auth')}
+              onSwitchToLecturerLogin={() => handleNavigate('lecturer-auth')}
+              onSwitchToAdminLogin={() => handleNavigate('admin-auth')}
             />
           )
         )}
 
-        {/* 4. LECTURER AUTH (LOGIN) PAGE */}
+        {/* 4. LECTURER AUTH (LOGIN & REGISTER) PAGE */}
         {currentView === 'lecturer-auth' && (
           <LecturerAuth
             lecturers={lecturers}
@@ -455,21 +500,22 @@ export default function App() {
               setCurrentView('lecturer-dashboard');
               showToast(`Signed in as ${lec.name}`);
             }}
-            onSwitchToStudentLogin={() => setCurrentView('student-auth')}
-            onSwitchToAdminLogin={() => setCurrentView('admin-auth')}
+            onRegisterSuccess={(newLec) => {
+              setLecturers(prev => [newLec, ...prev]);
+              setLoggedLecturer(newLec);
+              setCurrentView('lecturer-dashboard');
+              showToast(`Welcome to PolyIbadan Faculty Portal, ${newLec.name}!`);
+            }}
+            onSwitchToStudentLogin={() => handleNavigate('student-auth')}
+            onSwitchToAdminLogin={() => handleNavigate('admin-auth')}
           />
         )}
 
-        {/* 5. LECTURER DASHBOARD */}
+        {/* 5. LECTURER DASHBOARD (Strictly filtered to this lecturer) */}
         {currentView === 'lecturer-dashboard' && (
           loggedLecturer ? (
             <LecturerPortal
               currentLecturer={loggedLecturer}
-              allLecturers={lecturers}
-              onSwitchLecturer={(id) => {
-                const found = lecturers.find(l => l.id === id);
-                if (found) setLoggedLecturer(found);
-              }}
               requests={requests}
               onAcceptRequest={handleLecturerAcceptRequest}
               onRejectRequest={handleLecturerRejectRequest}
@@ -483,8 +529,13 @@ export default function App() {
                 setLoggedLecturer(lec);
                 setCurrentView('lecturer-dashboard');
               }}
-              onSwitchToStudentLogin={() => setCurrentView('student-auth')}
-              onSwitchToAdminLogin={() => setCurrentView('admin-auth')}
+              onRegisterSuccess={(newLec) => {
+                setLecturers(prev => [newLec, ...prev]);
+                setLoggedLecturer(newLec);
+                setCurrentView('lecturer-dashboard');
+              }}
+              onSwitchToStudentLogin={() => handleNavigate('student-auth')}
+              onSwitchToAdminLogin={() => handleNavigate('admin-auth')}
             />
           )
         )}
@@ -497,8 +548,8 @@ export default function App() {
               setCurrentView('admin-dashboard');
               showToast('Welcome to Academic Affairs Admin Portal');
             }}
-            onSwitchToStudentLogin={() => setCurrentView('student-auth')}
-            onSwitchToLecturerLogin={() => setCurrentView('lecturer-auth')}
+            onSwitchToStudentLogin={() => handleNavigate('student-auth')}
+            onSwitchToLecturerLogin={() => handleNavigate('lecturer-auth')}
           />
         )}
 
@@ -521,8 +572,8 @@ export default function App() {
                 setIsAdminLoggedIn(true);
                 setCurrentView('admin-dashboard');
               }}
-              onSwitchToStudentLogin={() => setCurrentView('student-auth')}
-              onSwitchToLecturerLogin={() => setCurrentView('lecturer-auth')}
+              onSwitchToStudentLogin={() => handleNavigate('student-auth')}
+              onSwitchToLecturerLogin={() => handleNavigate('lecturer-auth')}
             />
           )
         )}

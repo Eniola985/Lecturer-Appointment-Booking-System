@@ -2,13 +2,9 @@ import React, { useState } from 'react';
 import { 
   ShieldCheck, 
   Lock, 
-  Mail, 
+  User, 
   ArrowRight, 
-  AlertCircle, 
-  CheckCircle2, 
-  KeyRound, 
-  Copy, 
-  Check 
+  AlertCircle
 } from 'lucide-react';
 import { ADMIN_CREDENTIALS } from '../data/polyIbadanData';
 
@@ -23,35 +19,26 @@ export function AdminAuth({
   onSwitchToStudentLogin,
   onSwitchToLecturerLogin
 }: AdminAuthProps) {
-  const [email, setEmail] = useState(ADMIN_CREDENTIALS.email);
-  const [password, setPassword] = useState(ADMIN_CREDENTIALS.password);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
+    const cleanUsername = username.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    // Check strict credentials requested by user: username 'admin', password 'admin123'
     if (
-      email.trim().toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() &&
-      password.trim() === ADMIN_CREDENTIALS.password
+      cleanUsername === ADMIN_CREDENTIALS.username.toLowerCase() &&
+      cleanPassword === ADMIN_CREDENTIALS.password
     ) {
       onLoginSuccess();
     } else {
-      setError(`Invalid credentials. Use official admin email: ${ADMIN_CREDENTIALS.email} and the generated password.`);
+      setError('Invalid administrator username or password. Access is restricted to authorized personnel.');
     }
-  };
-
-  const autoFillCredentials = () => {
-    setEmail(ADMIN_CREDENTIALS.email);
-    setPassword(ADMIN_CREDENTIALS.password);
-    setError(null);
-  };
-
-  const copyPassword = () => {
-    navigator.clipboard.writeText(ADMIN_CREDENTIALS.password);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -75,45 +62,11 @@ export function AdminAuth({
       </div>
 
       <div className="bg-white border-2 border-[#E2D7CF] rounded-3xl p-6 sm:p-10 shadow-xl shadow-[#4A2E1B]/5 space-y-6">
-        {/* Prominent Admin Password Badge (As requested by user) */}
-        <div className="p-4 rounded-2xl bg-[#F5EFEB] border-2 border-[#D97706]/30 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-[#4A2E1B] uppercase tracking-wider flex items-center gap-1.5">
-              <KeyRound className="w-4 h-4 text-[#D97706]" />
-              Official Admin Master Password
-            </span>
-            <button
-              type="button"
-              onClick={copyPassword}
-              className="text-[11px] text-[#784728] hover:text-[#3B2211] font-semibold flex items-center gap-1 cursor-pointer"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Copy'}</span>
-            </button>
-          </div>
-          <div className="bg-white p-3 rounded-xl border border-[#E2D7CF] flex items-center justify-between font-mono text-xs">
-            <div>
-              <span className="text-[#8C5638] block text-[10px]">PASSWORD:</span>
-              <span className="font-bold text-[#4A2E1B] text-sm">{ADMIN_CREDENTIALS.password}</span>
-            </div>
-            <button
-              type="button"
-              onClick={autoFillCredentials}
-              className="px-3 py-1.5 bg-[#4A2E1B] hover:bg-[#3B2211] text-[#F59E0B] rounded-lg text-[11px] font-bold cursor-pointer transition-colors"
-            >
-              Auto-Fill
-            </button>
-          </div>
-          <p className="text-[11px] text-[#784728]">
-            Email: <strong className="text-[#3B2211]">{ADMIN_CREDENTIALS.email}</strong>
-          </p>
-        </div>
-
         <form onSubmit={handleLogin} className="space-y-5">
           <div className="border-b border-[#EFE6DF] pb-3">
             <h2 className="text-lg font-bold text-[#3B2211]">Administrator Sign In</h2>
             <p className="text-xs text-[#784728]">
-              Authorized administrative personnel only.
+              Enter administrator username and password to access the academic control console.
             </p>
           </div>
 
@@ -124,30 +77,37 @@ export function AdminAuth({
             </div>
           )}
 
+          {/* Username Input */}
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-[#D97706]" />
-              Administrator Email
+              <User className="w-3.5 h-3.5 text-[#D97706]" />
+              Admin Username
             </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter admin username"
               required
-              className="w-full px-4 py-3 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B]"
+              autoCapitalize="none"
+              autoComplete="username"
+              className="w-full px-4 py-3 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B] lowercase"
             />
           </div>
 
+          {/* Password Input */}
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-[#D97706]" />
-              Administrator Password
+              Admin Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter admin password"
               required
+              autoComplete="current-password"
               className="w-full px-4 py-3 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B]"
             />
           </div>
@@ -162,22 +122,26 @@ export function AdminAuth({
         </form>
       </div>
 
-      <div className="mt-8 flex items-center justify-center gap-4 text-xs text-[#784728]">
-        <button
-          type="button"
-          onClick={onSwitchToStudentLogin}
-          className="font-bold text-[#4A2E1B] hover:text-[#D97706] underline cursor-pointer"
-        >
-          &larr; Student Portal
-        </button>
-        <span>&bull;</span>
-        <button
-          type="button"
-          onClick={onSwitchToLecturerLogin}
-          className="font-bold text-[#4A2E1B] hover:text-[#D97706] underline cursor-pointer"
-        >
-          Lecturer Portal &rarr;
-        </button>
+      {/* Cross link if needed */}
+      <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-[#784728]">
+        <span>Return to other user portals:</span>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onSwitchToStudentLogin}
+            className="font-bold text-[#4A2E1B] hover:text-[#D97706] underline cursor-pointer"
+          >
+            Student Portal &rarr;
+          </button>
+          <span>&bull;</span>
+          <button
+            type="button"
+            onClick={onSwitchToLecturerLogin}
+            className="font-bold text-[#4A2E1B] hover:text-[#D97706] underline cursor-pointer"
+          >
+            Lecturer Portal &rarr;
+          </button>
+        </div>
       </div>
     </div>
   );

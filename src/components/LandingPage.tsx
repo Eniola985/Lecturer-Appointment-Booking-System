@@ -124,6 +124,10 @@ export function LandingPage({
                   <span>Go to My Student Dashboard</span>
                   <ArrowRight className="w-4 h-4 text-[#F59E0B]" />
                 </button>
+              ) : isLecturerLoggedIn || isAdminLoggedIn ? (
+                <div className="p-3 rounded-xl bg-slate-100 text-slate-500 text-xs text-center font-medium border border-slate-200">
+                  Access restricted to students. Sign out to switch roles.
+                </div>
               ) : (
                 <div className="flex flex-col gap-2">
                   <button
@@ -139,7 +143,7 @@ export function LandingPage({
                     onClick={() => onNavigate('student-auth')}
                     className="w-full py-2.5 px-4 bg-white border border-[#D1C2B6] hover:bg-[#EFE6DF] text-[#4A2E1B] font-bold text-xs rounded-xl cursor-pointer text-center"
                   >
-                    Register New Account
+                    Register New Student
                   </button>
                 </div>
               )}
@@ -177,12 +181,12 @@ export function LandingPage({
                 </div>
                 <div className="flex items-center gap-2 text-[11px]">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Unified password: <code className="font-mono font-bold text-[#D97706]">lecturer123</code></span>
+                  <span>Personal credentials for each faculty member</span>
                 </div>
               </div>
             </div>
 
-            <div className="pt-6 mt-6 border-t border-[#E2D7CF]">
+            <div className="pt-6 mt-6 border-t border-[#E2D7CF] space-y-2">
               {isLecturerLoggedIn ? (
                 <button
                   type="button"
@@ -192,15 +196,28 @@ export function LandingPage({
                   <span>Go to Lecturer Dashboard</span>
                   <ArrowRight className="w-4 h-4 text-[#F59E0B]" />
                 </button>
+              ) : isStudentLoggedIn || isAdminLoggedIn ? (
+                <div className="p-3 rounded-xl bg-slate-100 text-slate-500 text-xs text-center font-medium border border-slate-200">
+                  Access restricted to faculty. Sign out to switch roles.
+                </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => onNavigate('lecturer-auth')}
-                  className="w-full py-3 px-4 bg-[#4A2E1B] hover:bg-[#3B2211] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <span>Lecturer Login</span>
-                  <ArrowRight className="w-4 h-4 text-[#F59E0B]" />
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('lecturer-auth')}
+                    className="w-full py-3 px-4 bg-[#4A2E1B] hover:bg-[#3B2211] text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>Lecturer Login</span>
+                    <ArrowRight className="w-4 h-4 text-[#F59E0B]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('lecturer-auth')}
+                    className="w-full py-2.5 px-4 bg-white border border-[#D1C2B6] hover:bg-[#EFE6DF] text-[#4A2E1B] font-bold text-xs rounded-xl cursor-pointer text-center"
+                  >
+                    Create Faculty Account
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -228,15 +245,15 @@ export function LandingPage({
               <div className="space-y-1.5 pt-2 border-t border-[#E2D7CF] text-xs text-[#4A2E1B]">
                 <div className="flex items-center gap-2 text-[11px]">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Master audit of all appointments</span>
+                  <span>Master audit of student requests</span>
                 </div>
                 <div className="flex items-center gap-2 text-[11px]">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Add / manage lecturers & students</span>
+                  <span>Add & manage lecturers across departments</span>
                 </div>
                 <div className="flex items-center gap-2 text-[11px]">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Admin Password: <code className="font-mono font-bold text-[#D97706]">Admin@PolyIbadan2026</code></span>
+                  <span>Secure administrative access control</span>
                 </div>
               </div>
             </div>
@@ -251,6 +268,10 @@ export function LandingPage({
                   <span>Go to Admin Dashboard</span>
                   <ArrowRight className="w-4 h-4 text-[#F59E0B]" />
                 </button>
+              ) : isStudentLoggedIn || isLecturerLoggedIn ? (
+                <div className="p-3 rounded-xl bg-slate-100 text-slate-500 text-xs text-center font-medium border border-slate-200">
+                  Access restricted to admin. Sign out to switch roles.
+                </div>
               ) : (
                 <button
                   type="button"

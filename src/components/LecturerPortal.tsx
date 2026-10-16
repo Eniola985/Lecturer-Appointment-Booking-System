@@ -28,8 +28,6 @@ import {
 
 interface LecturerPortalProps {
   currentLecturer: Lecturer;
-  allLecturers: Lecturer[];
-  onSwitchLecturer: (lecturerId: string) => void;
   requests: AppointmentRequest[];
   onAcceptRequest: (requestId: string, responseNote: string, venue: string) => void;
   onRejectRequest: (requestId: string, rejectionReason: string) => void;
@@ -39,8 +37,6 @@ interface LecturerPortalProps {
 
 export function LecturerPortal({
   currentLecturer,
-  allLecturers,
-  onSwitchLecturer,
   requests,
   onAcceptRequest,
   onRejectRequest,
@@ -131,23 +127,13 @@ export function LecturerPortal({
             </div>
           </div>
 
-          {/* Quick Faculty Switcher for Demo testing */}
-          <div className="bg-[#FAF7F5] border border-[#E2D7CF] rounded-2xl p-3 flex items-center gap-3 w-full lg:w-auto">
-            <div className="text-right hidden sm:block">
-              <span className="text-[10px] uppercase font-bold text-[#8C5638] block">Switch Lecturer Account</span>
-              <span className="text-xs text-[#4A2E1B] font-semibold">Test other departmental desks</span>
+          {/* Verified Faculty Desk Badge */}
+          <div className="bg-[#FAF7F5] border border-[#E2D7CF] rounded-2xl p-3 px-4 flex items-center gap-3">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+            <div>
+              <span className="text-[10px] uppercase font-bold text-[#8C5638] block">Personal Desk Active</span>
+              <span className="text-xs text-[#4A2E1B] font-bold">Only Your Requests Shown</span>
             </div>
-            <select
-              value={currentLecturer.id}
-              onChange={(e) => onSwitchLecturer(e.target.value)}
-              className="px-3.5 py-2 bg-white border border-[#D1C2B6] rounded-xl text-xs font-bold text-[#3B2211] focus:outline-none focus:border-[#4A2E1B] cursor-pointer w-full sm:w-auto"
-            >
-              {allLecturers.map((lec) => (
-                <option key={lec.id} value={lec.id}>
-                  {lec.name} ({lec.department.split(' ')[0]})
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 

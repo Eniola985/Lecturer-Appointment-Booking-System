@@ -76,8 +76,6 @@ export function AdminPortal({
   const [newNoticeTarget, setNewNoticeTarget] = useState<'all' | 'students' | 'lecturers'>('all');
   const [noticePostedSuccess, setNoticePostedSuccess] = useState(false);
 
-  // Password copy feedback
-  const [copiedPassword, setCopiedPassword] = useState(false);
 
   const totalRequests = requests.length;
   const pendingRequests = requests.filter(r => r.status === 'pending').length;
@@ -195,27 +193,13 @@ export function AdminPortal({
             </div>
           </div>
 
-          {/* Admin Password Reference Card (As requested by user) */}
-          <div className="bg-[#FAF7F5] border border-[#E2D7CF] rounded-2xl p-3.5 space-y-1 w-full lg:w-auto">
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-[10px] font-bold text-[#8C5638] uppercase">Official Admin Password</span>
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(ADMIN_CREDENTIALS.password);
-                  setCopiedPassword(true);
-                  setTimeout(() => setCopiedPassword(false), 2000);
-                }}
-                className="text-[10px] font-bold text-[#4A2E1B] hover:text-[#D97706] flex items-center gap-1 cursor-pointer"
-              >
-                {copiedPassword ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                <span>{copiedPassword ? 'Copied' : 'Copy'}</span>
-              </button>
+          {/* Administrative Status Badge */}
+          <div className="bg-[#FAF7F5] border border-[#E2D7CF] rounded-2xl p-3 px-4 flex items-center gap-3">
+            <div className="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-pulse"></div>
+            <div>
+              <span className="text-[10px] uppercase font-bold text-[#8C5638] block">Academic Affairs Console</span>
+              <span className="text-xs text-[#4A2E1B] font-bold">Registry Management Active</span>
             </div>
-            <div className="font-mono font-black text-sm text-[#4A2E1B] bg-white px-3 py-1 rounded-lg border border-[#E2D7CF]">
-              {ADMIN_CREDENTIALS.password}
-            </div>
-            <div className="text-[10px] text-[#784728]">Login: {ADMIN_CREDENTIALS.email}</div>
           </div>
         </div>
 

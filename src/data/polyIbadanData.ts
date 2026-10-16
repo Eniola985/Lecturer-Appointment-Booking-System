@@ -1,13 +1,12 @@
 import { Lecturer, Student, AppointmentRequest, SystemAnnouncement } from '../types/booking';
 
 export const ADMIN_CREDENTIALS = {
+  username: 'admin',
+  password: 'admin123',
   email: 'admin@polyibadan.edu.ng',
-  password: 'Admin@PolyIbadan2026',
   name: 'Academic Affairs Admin',
   role: 'admin'
 };
-
-export const LECTURER_DEFAULT_PASSWORD = 'lecturer123';
 
 export const POLY_FACULTIES_AND_DEPTS = [
   {
@@ -38,7 +37,7 @@ export const INITIAL_STUDENTS: Student[] = [
     matricNumber: '2024/ND/CSC/0842',
     fullName: 'Haleelat Adebayo',
     email: 'adebayohaleelat6@gmail.com',
-    password: 'password123',
+    password: '2024/ND/CSC/0842',
     department: 'Computer Science',
     faculty: 'Faculty of Science',
     level: 'ND II',
@@ -50,7 +49,7 @@ export const INITIAL_STUDENTS: Student[] = [
     matricNumber: '2023/HND/EEE/0194',
     fullName: 'Babatunde Olumide Alabi',
     email: 'babatunde.alabi@student.polyibadan.edu.ng',
-    password: 'password123',
+    password: '2023/HND/EEE/0194',
     department: 'Electrical & Electronics Engineering',
     faculty: 'Faculty of Engineering',
     level: 'HND II',
@@ -62,7 +61,7 @@ export const INITIAL_STUDENTS: Student[] = [
     matricNumber: '2024/ND/ACC/0512',
     fullName: 'Zainab Folake Olawale',
     email: 'zainab.olawale@student.polyibadan.edu.ng',
-    password: 'password123',
+    password: '2024/ND/ACC/0512',
     department: 'Accountancy',
     faculty: 'Faculty of Financial Management Studies (FFMS)',
     level: 'ND I',
@@ -78,6 +77,7 @@ export const INITIAL_LECTURERS: Lecturer[] = [
     name: 'Engr. Dr. O. A. Babalola',
     title: 'Chief Lecturer & Head of Department',
     email: 'o.babalola@polyibadan.edu.ng',
+    password: 'babalola2026',
     department: 'Computer Science',
     faculty: 'Faculty of Science',
     officeLocation: 'Room 12, Computer Science HOD Block, North Campus',
@@ -93,6 +93,7 @@ export const INITIAL_LECTURERS: Lecturer[] = [
     name: 'Dr. (Mrs.) F. O. Adeleke',
     title: 'Principal Lecturer',
     email: 'f.adeleke@polyibadan.edu.ng',
+    password: 'adeleke2026',
     department: 'Computer Science',
     faculty: 'Faculty of Science',
     officeLocation: 'Office 08, Staff Wing A, North Campus',
@@ -108,6 +109,7 @@ export const INITIAL_LECTURERS: Lecturer[] = [
     name: 'Mr. K. T. Oloyede',
     title: 'Senior Lecturer',
     email: 'k.oloyede@polyibadan.edu.ng',
+    password: 'oloyede2026',
     department: 'Mathematics & Statistics',
     faculty: 'Faculty of Science',
     officeLocation: 'Math Departmental Complex, South Campus',
@@ -123,6 +125,7 @@ export const INITIAL_LECTURERS: Lecturer[] = [
     name: 'Engr. M. B. Sanusi',
     title: 'Chief Lecturer',
     email: 'm.sanusi@polyibadan.edu.ng',
+    password: 'sanusi2026',
     department: 'Electrical & Electronics Engineering',
     faculty: 'Faculty of Engineering',
     officeLocation: 'Engineering Workshop Block B, North Campus',
@@ -138,6 +141,7 @@ export const INITIAL_LECTURERS: Lecturer[] = [
     name: 'Mrs. B. A. Oladipo',
     title: 'Principal Lecturer',
     email: 'b.oladipo@polyibadan.edu.ng',
+    password: 'oladipo2026',
     department: 'Accountancy',
     faculty: 'Faculty of Financial Management Studies (FFMS)',
     officeLocation: 'Room 204, FFMS Academic Block, South Campus',
@@ -153,6 +157,7 @@ export const INITIAL_LECTURERS: Lecturer[] = [
     name: 'Dr. A. J. Ogundele',
     title: 'Senior Lecturer',
     email: 'a.ogundele@polyibadan.edu.ng',
+    password: 'ogundele2026',
     department: 'Mass Communication',
     faculty: 'Faculty of Business & Communication Studies (FBCS)',
     officeLocation: 'Broadcasting Studio Wing, FBCS Complex',
