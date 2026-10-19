@@ -8,6 +8,7 @@ import {
   SystemAnnouncement 
 } from '../types/booking';
 import { POLY_FACULTIES_AND_DEPTS } from '../data/polyIbadanData';
+import { SchoolLogo } from './SchoolLogo';
 import { 
   GraduationCap, 
   Calendar, 
@@ -204,9 +205,7 @@ export function StudentPortal({
 
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#4A2E1B] text-[#F59E0B] flex items-center justify-center font-bold text-2xl shadow-lg border-2 border-[#D97706]/40 shrink-0">
-              <GraduationCap className="w-9 h-9" />
-            </div>
+            <SchoolLogo size="lg" className="shadow-lg ring-4 ring-[#D97706]/20" />
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#4A2E1B] text-[#FDFBF7]">
@@ -882,8 +881,11 @@ export function StudentPortal({
       {bookingSuccessModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#3B2211]/60 backdrop-blur-sm">
           <div className="bg-white border-2 border-[#E2D7CF] rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center space-y-5 shadow-2xl">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 border-2 border-emerald-300 text-emerald-700 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-8 h-8" />
+            <div className="flex items-center justify-center gap-3">
+              <SchoolLogo size="md" />
+              <div className="w-12 h-12 rounded-full bg-emerald-100 border-2 border-emerald-300 text-emerald-700 flex items-center justify-center">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
             </div>
 
             <div>

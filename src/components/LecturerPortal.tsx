@@ -25,6 +25,7 @@ import {
   ArrowRight,
   GraduationCap
 } from 'lucide-react';
+import { SchoolLogo } from './SchoolLogo';
 
 interface LecturerPortalProps {
   currentLecturer: Lecturer;
@@ -32,7 +33,7 @@ interface LecturerPortalProps {
   onAcceptRequest: (requestId: string, responseNote: string, venue: string) => void;
   onRejectRequest: (requestId: string, rejectionReason: string) => void;
   onCompleteAppointment: (requestId: string, notes?: string) => void;
-  onUpdateOfficeHours: (lecturerId: string, daysText: string, officeText: string) => void;
+  onUpdateOfficeHours: (lecturerId: string, daysText: string, officeText: string, titleText?: string) => void;
 }
 
 export function LecturerPortal({
@@ -55,6 +56,7 @@ export function LecturerPortal({
   const [rejectReason, setRejectReason] = useState('Unavailable during this proposed time slot due to department schedule. Please re-book on my routine consultation day.');
 
   // Office settings
+  const [editTitle, setEditTitle] = useState(currentLecturer.title);
   const [editDays, setEditDays] = useState(currentLecturer.consultationDays);
   const [editOffice, setEditOffice] = useState(currentLecturer.officeLocation);
   const [settingsSaved, setSettingsSaved] = useState(false);
@@ -92,7 +94,7 @@ export function LecturerPortal({
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdateOfficeHours(currentLecturer.id, editDays.trim(), editOffice.trim());
+    onUpdateOfficeHours(currentLecturer.id, editDays.trim(), editOffice.trim(), editTitle.trim());
     setSettingsSaved(true);
     setTimeout(() => setSettingsSaved(false), 2500);
   };
@@ -129,10 +131,10 @@ export function LecturerPortal({
 
           {/* Verified Faculty Desk Badge */}
           <div className="bg-[#FAF7F5] border border-[#E2D7CF] rounded-2xl p-3 px-4 flex items-center gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+            <SchoolLogo size="sm" />
             <div>
               <span className="text-[10px] uppercase font-bold text-[#8C5638] block">Personal Desk Active</span>
-              <span className="text-xs text-[#4A2E1B] font-bold">Only Your Requests Shown</span>
+              <span className="text-xs text-[#4A2E1B] font-bold">The Polytechnic, Ibadan</span>
             </div>
           </div>
         </div>
@@ -518,6 +520,21 @@ export function LecturerPortal({
           )}
 
           <form onSubmit={handleSaveSettings} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center justify-between">
+                <span>Academic Title / Designation</span>
+                <span className="text-[10px] text-[#8C5638] font-normal">customizable text</span>
+              </label>
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="e.g. Senior Lecturer, Reader, HOD, Course Advisor..."
+                required
+                className="w-full px-4 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B]"
+              />
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
                 Departmental Office Location

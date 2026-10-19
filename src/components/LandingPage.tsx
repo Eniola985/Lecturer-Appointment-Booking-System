@@ -18,6 +18,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { SystemAnnouncement } from '../types/booking';
+import { SchoolLogo } from './SchoolLogo';
 
 interface LandingPageProps {
   onNavigate: (view: 'student-auth' | 'lecturer-auth' | 'admin-auth' | 'student-dashboard' | 'lecturer-dashboard' | 'admin-dashboard') => void;
@@ -51,9 +52,12 @@ export function LandingPage({
         <div className="absolute top-0 right-0 w-96 h-full bg-gradient-to-l from-[#F5EFEB] to-transparent pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF7F5] border border-[#E2D7CF] text-[#8C5638] text-xs font-bold uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-[#D97706] animate-pulse" />
-            <span>The Polytechnic, Ibadan &bull; Official Advisory Portal</span>
+          <div className="flex flex-col items-center justify-center gap-3">
+            <SchoolLogo size="xl" className="shadow-2xl hover:scale-105 transition-transform duration-300 ring-4 ring-[#D97706]/20" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF7F5] border border-[#E2D7CF] text-[#8C5638] text-xs font-bold uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-[#D97706] animate-pulse" />
+              <span>The Polytechnic, Ibadan &bull; Official Advisory Portal</span>
+            </div>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-[#3B2211] tracking-tight leading-tight sm:leading-none">
@@ -413,6 +417,16 @@ export function LandingPage({
           </div>
         </div>
       </section>
+
+      {/* INSTITUTIONAL FOOTER */}
+      <footer className="border-t-2 border-[#E2D7CF] pt-10 pb-6 text-center text-xs text-[#784728] space-y-4">
+        <div className="flex justify-center">
+          <SchoolLogo showText size="lg" textVariant="footer" subtext="North Campus & South Campus &bull; P.M.B. 22, U.I. Post Office, Ibadan, Oyo State, Nigeria" />
+        </div>
+        <p className="text-[11px] text-[#A89282]">
+          &copy; {new Date().getFullYear()} The Polytechnic, Ibadan. All Rights Reserved. Directorate of Academic Affairs & ICT Center.
+        </p>
+      </footer>
     </div>
   );
 }

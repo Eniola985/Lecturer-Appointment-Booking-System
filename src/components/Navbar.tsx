@@ -12,6 +12,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { Student, Lecturer, NotificationItem } from '../types/booking';
+import { SchoolLogo } from './SchoolLogo';
 
 export type ActiveView = 
   | 'landing'
@@ -85,9 +86,7 @@ export function Navbar({
           className="flex items-center gap-3 cursor-pointer group"
           title="The Polytechnic, Ibadan"
         >
-          <div className="w-11 h-11 rounded-2xl bg-[#4A2E1B] text-[#FDFBF7] flex items-center justify-center shadow-md border-2 border-[#D97706]/40 shrink-0 group-hover:scale-105 transition-transform">
-            <GraduationCap className="w-6 h-6 text-[#F59E0B]" />
-          </div>
+          <SchoolLogo size="md" />
           <div>
             <div className="flex items-center gap-2">
               <span className="font-black text-base sm:text-lg tracking-tight text-[#3B2211]">

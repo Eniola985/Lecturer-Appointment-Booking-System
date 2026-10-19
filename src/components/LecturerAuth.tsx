@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Lecturer } from '../types/booking';
 import { POLY_FACULTIES_AND_DEPTS } from '../data/polyIbadanData';
+import { SchoolLogo } from './SchoolLogo';
 
 interface LecturerAuthProps {
   lecturers: Lecturer[];
@@ -42,6 +43,8 @@ export function LecturerAuth({
   // Register form state
   const [regName, setRegName] = useState('');
   const [regTitle, setRegTitle] = useState('Senior Lecturer');
+  const [isCustomTitle, setIsCustomTitle] = useState(false);
+  const [customTitle, setCustomTitle] = useState('');
   const [regFaculty, setRegFaculty] = useState(POLY_FACULTIES_AND_DEPTS[0].faculty);
   const [regDept, setRegDept] = useState(POLY_FACULTIES_AND_DEPTS[0].departments[0]);
   const [regStaffId, setRegStaffId] = useState('');
@@ -97,8 +100,9 @@ export function LecturerAuth({
     e.preventDefault();
     setRegError(null);
 
-    if (!regName.trim() || !regEmail.trim() || !regPassword.trim()) {
-      setRegError('Please fill in all mandatory fields.');
+    const finalTitle = isCustomTitle ? customTitle.trim() : regTitle.trim();
+    if (!regName.trim() || !regEmail.trim() || !regPassword.trim() || !finalTitle) {
+      setRegError('Please fill in all mandatory fields, including your academic title / position.');
       return;
     }
 
@@ -126,7 +130,7 @@ export function LecturerAuth({
       id: `lec-${Date.now()}`,
       staffId: regStaffId.trim() || `TPI/STF/2026/${Math.floor(100 + Math.random() * 900)}`,
       name: regName.trim(),
-      title: regTitle.trim(),
+      title: finalTitle,
       email: regEmail.trim().toLowerCase(),
       password: regPassword.trim(),
       faculty: regFaculty,
@@ -152,8 +156,8 @@ export function LecturerAuth({
     <div className="max-w-2xl mx-auto my-6 sm:my-10 px-4">
       {/* Emblem */}
       <div className="text-center mb-8 space-y-3">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#4A2E1B] text-[#FDFBF7] shadow-xl border-2 border-[#D97706]/40 mb-2">
-          <Building2 className="w-10 h-10 text-[#F59E0B]" />
+        <div className="flex justify-center mb-2">
+          <SchoolLogo size="xl" className="shadow-2xl hover:scale-105 transition-transform" />
         </div>
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-[#8C5638] bg-[#F5EFEB] px-3 py-1 rounded-full border border-[#E2D7CF]">
@@ -310,12 +314,12 @@ export function LecturerAuth({
               </div>
             )}
 
-            {/* Name & Title */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
+            {/* Row 1: Full Name & Academic Title (aligned symmetrically in 2 columns) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
                   <User className="w-3.5 h-3.5 text-[#D97706]" />
-                  Full Name (Your Username) *
+                  <span>Full Name (Your Username) *</span>
                 </label>
                 <input
                   type="text"
@@ -323,39 +327,92 @@ export function LecturerAuth({
                   onChange={(e) => setRegName(e.target.value)}
                   placeholder="e.g. Mr. Eniola A. Adeleke"
                   required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
-                  Academic Title *
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center justify-between h-5">
+                  <span>Academic Title / Position *</span>
+                  {isCustomTitle && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCustomTitle(false);
+                        setRegTitle('Senior Lecturer');
+                      }}
+                      className="text-[10px] text-[#8C5638] hover:text-[#4A2E1B] underline cursor-pointer font-normal normal-case"
+                    >
+                      Use dropdown list
+                    </button>
+                  )}
                 </label>
-                <select
-                  value={regTitle}
-                  onChange={(e) => setRegTitle(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B]"
-                >
-                  <option value="Chief Lecturer">Chief Lecturer</option>
-                  <option value="Principal Lecturer">Principal Lecturer</option>
-                  <option value="Senior Lecturer">Senior Lecturer</option>
-                  <option value="Lecturer I">Lecturer I</option>
-                  <option value="Lecturer II">Lecturer II</option>
-                  <option value="Assistant Lecturer">Assistant Lecturer</option>
-                </select>
+
+                {!isCustomTitle ? (
+                  <select
+                    value={regTitle}
+                    onChange={(e) => {
+                      if (e.target.value === 'CUSTOM_OTHER') {
+                        setIsCustomTitle(true);
+                        setCustomTitle('');
+                      } else {
+                        setRegTitle(e.target.value);
+                      }
+                    }}
+                    className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B] h-11 cursor-pointer"
+                  >
+                    <option value="Senior Lecturer">Senior Lecturer</option>
+                    <option value="Chief Lecturer">Chief Lecturer</option>
+                    <option value="Principal Lecturer">Principal Lecturer</option>
+                    <option value="Lecturer I">Lecturer I</option>
+                    <option value="Lecturer II">Lecturer II</option>
+                    <option value="Assistant Lecturer">Assistant Lecturer</option>
+                    <option value="Head of Department (HOD)">Head of Department (HOD)</option>
+                    <option value="Dean of Faculty">Dean of Faculty</option>
+                    <option value="Reader / Associate Professor">Reader / Associate Professor</option>
+                    <option value="Professor">Professor</option>
+                    <option value="CUSTOM_OTHER">&#9998; Other (Type Custom Position...)</option>
+                  </select>
+                ) : (
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={customTitle}
+                      onChange={(e) => {
+                        setCustomTitle(e.target.value);
+                        setRegTitle(e.target.value);
+                      }}
+                      placeholder="Type your exact position (e.g. Course Advisor)..."
+                      required
+                      autoFocus
+                      className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border-2 border-[#D97706] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11 pr-14"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCustomTitle(false);
+                        setRegTitle('Senior Lecturer');
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-bold text-[#8C5638] hover:text-[#4A2E1B] bg-white border border-[#E2D7CF] rounded-lg shadow-xs cursor-pointer"
+                      title="Switch back to standard dropdown"
+                    >
+                      Dropdown
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Faculty & Department */}
+            {/* Row 2: Faculty & Department */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center h-5">
                   Faculty *
                 </label>
                 <select
                   value={regFaculty}
                   onChange={(e) => handleFacultyChange(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B] h-11 cursor-pointer"
                 >
                   {POLY_FACULTIES_AND_DEPTS.map((f) => (
                     <option key={f.faculty} value={f.faculty}>
@@ -366,13 +423,13 @@ export function LecturerAuth({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center h-5">
                   Department *
                 </label>
                 <select
                   value={regDept}
                   onChange={(e) => setRegDept(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B] h-11 cursor-pointer"
                 >
                   {selectedFacultyObj.departments.map((d) => (
                     <option key={d} value={d}>
@@ -383,11 +440,12 @@ export function LecturerAuth({
               </div>
             </div>
 
-            {/* Email & Staff ID */}
+            {/* Row 3: Email & Staff ID */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
-                  Staff Email *
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
+                  <Mail className="w-3.5 h-3.5 text-[#D97706]" />
+                  <span>Staff Email *</span>
                 </label>
                 <input
                   type="email"
@@ -395,30 +453,31 @@ export function LecturerAuth({
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="e.g. lecturer@polyibadan.edu.ng"
                   required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
-                  Staff ID (Optional)
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
+                  <Building2 className="w-3.5 h-3.5 text-[#D97706]" />
+                  <span>Staff ID (Optional)</span>
                 </label>
                 <input
                   type="text"
                   value={regStaffId}
                   onChange={(e) => setRegStaffId(e.target.value)}
                   placeholder="e.g. TPI/STF/2026/044"
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] font-mono"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] font-mono h-11"
                 />
               </div>
             </div>
 
-            {/* Office Venue & Consultation Days */}
+            {/* Row 4: Office Venue & Consultation Days */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
                   <MapPin className="w-3.5 h-3.5 text-[#D97706]" />
-                  Office Venue *
+                  <span>Office Venue *</span>
                 </label>
                 <input
                   type="text"
@@ -426,14 +485,14 @@ export function LecturerAuth({
                   onChange={(e) => setRegOffice(e.target.value)}
                   placeholder="e.g. Room 14, CS Complex, North Campus"
                   required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
                   <Clock className="w-3.5 h-3.5 text-[#D97706]" />
-                  Weekly Consultation Days *
+                  <span>Weekly Consultation Days *</span>
                 </label>
                 <input
                   type="text"
@@ -441,17 +500,17 @@ export function LecturerAuth({
                   onChange={(e) => setRegDays(e.target.value)}
                   placeholder="e.g. Tuesdays & Thursdays (10:00 AM - 1:00 PM)"
                   required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11"
                 />
               </div>
             </div>
 
-            {/* Password Creation */}
+            {/* Row 5: Password Creation */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
                   <Lock className="w-3.5 h-3.5 text-[#D97706]" />
-                  Create Password *
+                  <span>Create Password *</span>
                 </label>
                 <input
                   type="password"
@@ -459,14 +518,14 @@ export function LecturerAuth({
                   onChange={(e) => setRegPassword(e.target.value)}
                   placeholder="Enter password"
                   required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
                   <Lock className="w-3.5 h-3.5 text-[#D97706]" />
-                  Confirm Password *
+                  <span>Confirm Password *</span>
                 </label>
                 <input
                   type="password"
@@ -474,7 +533,7 @@ export function LecturerAuth({
                   onChange={(e) => setRegConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
                   required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11"
                 />
               </div>
             </div>

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Student, StudentLevel } from '../types/booking';
 import { POLY_FACULTIES_AND_DEPTS } from '../data/polyIbadanData';
+import { SchoolLogo } from './SchoolLogo';
 
 interface StudentAuthProps {
   students: Student[];
@@ -145,8 +146,8 @@ export function StudentAuth({
     <div className="max-w-2xl mx-auto my-6 sm:my-10 px-4">
       {/* Institution Emblem & Header */}
       <div className="text-center mb-8 space-y-3">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#4A2E1B] text-[#FDFBF7] shadow-xl border-2 border-[#D97706]/40 mb-2">
-          <GraduationCap className="w-10 h-10 text-[#F59E0B]" />
+        <div className="flex justify-center mb-2">
+          <SchoolLogo size="xl" className="shadow-2xl hover:scale-105 transition-transform" />
         </div>
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-[#8C5638] bg-[#F5EFEB] px-3 py-1 rounded-full border border-[#E2D7CF]">
@@ -314,59 +315,25 @@ export function StudentAuth({
               </div>
             )}
 
-            {/* Full Name */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-[#D97706]" />
-                Student Full Name (This will be your Username) *
-              </label>
-              <input
-                type="text"
-                value={regFullName}
-                onChange={(e) => setRegFullName(e.target.value)}
-                placeholder="e.g. Adebayo Haleelat Funmilayo"
-                required
-                className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
-              />
-            </div>
-
-            {/* Matriculation Number & Confirmation */}
+            {/* Row 1: Full Name & Email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
-                  <Hash className="w-3.5 h-3.5 text-[#D97706]" />
-                  Matriculation Number (Your Password) *
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
+                  <User className="w-3.5 h-3.5 text-[#D97706]" />
+                  <span>Student Full Name (Username) *</span>
                 </label>
                 <input
                   type="text"
-                  value={regMatric}
-                  onChange={(e) => setRegMatric(e.target.value)}
-                  placeholder="e.g. 2024/ND/CSC/0842"
+                  value={regFullName}
+                  onChange={(e) => setRegFullName(e.target.value)}
+                  placeholder="e.g. Adebayo Haleelat Funmilayo"
                   required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] font-mono uppercase"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5">
-                  <Hash className="w-3.5 h-3.5 text-[#D97706]" />
-                  Confirm Matriculation Number *
-                </label>
-                <input
-                  type="text"
-                  value={regConfirmMatric}
-                  onChange={(e) => setRegConfirmMatric(e.target.value)}
-                  placeholder="Re-enter matric number"
-                  required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] font-mono uppercase"
-                />
-              </div>
-            </div>
-
-            {/* Email & Phone */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center h-5">
                   Student Email Address *
                 </label>
                 <input
@@ -375,34 +342,54 @@ export function StudentAuth({
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="e.g. student@polyibadan.edu.ng"
                   required
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  value={regPhone}
-                  onChange={(e) => setRegPhone(e.target.value)}
-                  placeholder="e.g. +234 812 345 6789"
-                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11"
                 />
               </div>
             </div>
 
-            {/* Faculty, Department, Level */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
+            {/* Row 2: Matriculation Number & Confirmation (Your Password) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
+                  <Hash className="w-3.5 h-3.5 text-[#D97706]" />
+                  <span>Matriculation No. (Your Password) *</span>
+                </label>
+                <input
+                  type="text"
+                  value={regMatric}
+                  onChange={(e) => setRegMatric(e.target.value)}
+                  placeholder="e.g. 2024/ND/CSC/0842"
+                  required
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] font-mono uppercase h-11"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center gap-1.5 h-5">
+                  <Hash className="w-3.5 h-3.5 text-[#D97706]" />
+                  <span>Confirm Matriculation No. *</span>
+                </label>
+                <input
+                  type="text"
+                  value={regConfirmMatric}
+                  onChange={(e) => setRegConfirmMatric(e.target.value)}
+                  placeholder="Re-enter matric number"
+                  required
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] font-mono uppercase h-11"
+                />
+              </div>
+            </div>
+
+            {/* Row 3: Faculty & Department */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center h-5">
                   Faculty *
                 </label>
                 <select
                   value={regFaculty}
                   onChange={(e) => handleFacultyChange(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B] h-11 cursor-pointer"
                 >
                   {POLY_FACULTIES_AND_DEPTS.map((f) => (
                     <option key={f.faculty} value={f.faculty}>
@@ -413,13 +400,33 @@ export function StudentAuth({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center h-5">
+                  Department *
+                </label>
+                <select
+                  value={regDept}
+                  onChange={(e) => setRegDept(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B] h-11 cursor-pointer"
+                >
+                  {selectedFacultyObj.departments.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Row 4: Academic Level & Phone Number */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center h-5">
                   Academic Level *
                 </label>
                 <select
                   value={regLevel}
                   onChange={(e) => setRegLevel(e.target.value as StudentLevel)}
-                  className="w-full px-3 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B]"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B] h-11 cursor-pointer"
                 >
                   <option value="ND I">ND I (National Diploma 1)</option>
                   <option value="ND II">ND II (National Diploma 2)</option>
@@ -427,23 +434,19 @@ export function StudentAuth({
                   <option value="HND II">HND II (Higher National Diploma 2)</option>
                 </select>
               </div>
-            </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B]">
-                Department *
-              </label>
-              <select
-                value={regDept}
-                onChange={(e) => setRegDept(e.target.value)}
-                className="w-full px-3 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] focus:outline-none focus:border-[#4A2E1B]"
-              >
-                {selectedFacultyObj.departments.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#4A2E1B] flex items-center h-5">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={regPhone}
+                  onChange={(e) => setRegPhone(e.target.value)}
+                  placeholder="e.g. +234 812 345 6789"
+                  className="w-full px-3.5 py-2.5 bg-[#FAF7F5] border border-[#D1C2B6] rounded-xl text-xs text-[#3B2211] placeholder-[#A89282] focus:outline-none focus:border-[#4A2E1B] h-11"
+                />
+              </div>
             </div>
 
             <button

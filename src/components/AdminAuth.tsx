@@ -7,6 +7,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { ADMIN_CREDENTIALS } from '../data/polyIbadanData';
+import { SchoolLogo } from './SchoolLogo';
 
 interface AdminAuthProps {
   onLoginSuccess: () => void;
@@ -45,8 +46,8 @@ export function AdminAuth({
     <div className="max-w-xl mx-auto my-6 sm:my-12 px-4">
       {/* Emblem */}
       <div className="text-center mb-8 space-y-3">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#4A2E1B] text-[#FDFBF7] shadow-xl border-2 border-[#D97706]/40 mb-2">
-          <ShieldCheck className="w-10 h-10 text-[#F59E0B]" />
+        <div className="flex justify-center mb-2">
+          <SchoolLogo size="xl" className="shadow-2xl hover:scale-105 transition-transform" />
         </div>
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-[#8C5638] bg-[#F5EFEB] px-3 py-1 rounded-full border border-[#E2D7CF]">

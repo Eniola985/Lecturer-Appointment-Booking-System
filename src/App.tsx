@@ -316,12 +316,22 @@ export default function App() {
     showToast('Consultation marked as concluded');
   };
 
-  const handleLecturerUpdateOfficeHours = (lecturerId: string, daysText: string, officeText: string) => {
+  const handleLecturerUpdateOfficeHours = (lecturerId: string, daysText: string, officeText: string, titleText?: string) => {
     setLecturers(prev =>
-      prev.map(l => (l.id === lecturerId ? { ...l, consultationDays: daysText, officeLocation: officeText } : l))
+      prev.map(l => (l.id === lecturerId ? { 
+        ...l, 
+        consultationDays: daysText, 
+        officeLocation: officeText,
+        title: titleText && titleText.trim() ? titleText.trim() : l.title
+      } : l))
     );
     if (loggedLecturer && loggedLecturer.id === lecturerId) {
-      setLoggedLecturer(prev => prev ? { ...prev, consultationDays: daysText, officeLocation: officeText } : null);
+      setLoggedLecturer(prev => prev ? { 
+        ...prev, 
+        consultationDays: daysText, 
+        officeLocation: officeText,
+        title: titleText && titleText.trim() ? titleText.trim() : prev.title
+      } : null);
     }
   };
 

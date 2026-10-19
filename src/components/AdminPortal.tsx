@@ -6,6 +6,7 @@ import {
   SystemAnnouncement 
 } from '../types/booking';
 import { POLY_FACULTIES_AND_DEPTS, ADMIN_CREDENTIALS } from '../data/polyIbadanData';
+import { SchoolLogo } from './SchoolLogo';
 import { 
   ShieldCheck, 
   Users, 
@@ -174,9 +175,7 @@ export function AdminPortal({
       <div className="bg-white border-2 border-[#E2D7CF] rounded-3xl p-6 sm:p-8 shadow-xl shadow-[#4A2E1B]/5 relative overflow-hidden">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#4A2E1B] text-[#F59E0B] flex items-center justify-center font-bold text-2xl shadow-lg border-2 border-[#D97706]/40 shrink-0">
-              <ShieldCheck className="w-10 h-10" />
-            </div>
+            <SchoolLogo size="lg" className="shadow-lg ring-4 ring-[#D97706]/20" />
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#4A2E1B] text-[#FDFBF7]">

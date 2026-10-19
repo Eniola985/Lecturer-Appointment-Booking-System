@@ -1,6 +1,6 @@
 {
-  "name": "Studio Launchpad",
-  "description": "Comprehensive Lecturer Appointment Booking System for Students and Faculty with real-time office hours, schedule management, and instant booking.",
+  "name": "FacultyConnect - Lecturer Appointment Booking System",
+  "description": "Comprehensive University Lecturer Appointment Booking System for Students and Faculty with real-time office hours and virtual consultations.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
